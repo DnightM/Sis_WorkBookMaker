@@ -2,7 +2,6 @@ package util;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -13,7 +12,6 @@ import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 public class ReadXml {
@@ -38,20 +36,15 @@ public class ReadXml {
         }
     }
 
-    public ArrayList<File> getInputFileList() {
-        ArrayList<File> inputFiles = new ArrayList<>();
-        NodeList nl = root.getElementsByTagName("input");
-        for (int i = 0; i < nl.getLength(); i++) {
-            Node n = nl.item(i);
-            File f = new File(n.getTextContent().trim());
-            if (f.isFile()) {
-                inputFiles.add(f);
-            } else {
-                logger.error("Error | This is not a file. | " + f);
-                return null;
-            }
+    public File[] getInputFiles() {
+        Node n = root.getElementsByTagName("input").item(0);
+        File f = new File(n.getTextContent().trim());
+        if (f.isDirectory()) {
+            return f.listFiles();
+        } else {
+            logger.error("Error | This is not directory. | " + f);
+            return null;
         }
-        return inputFiles;
     }
 
     public File getOutputDirFile() {
@@ -60,7 +53,7 @@ public class ReadXml {
         if (outputDir.isDirectory()) {
             return outputDir;
         } else {
-            logger.error("Error | This is not a Directory. | " + outputDir);
+            logger.error("Error | This is not directory. | " + outputDir);
             return null;
         }
     }

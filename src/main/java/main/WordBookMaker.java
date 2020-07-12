@@ -18,9 +18,17 @@ public class WordBookMaker {
     private WriteExcel excel = new WriteExcel();
     private PdfExtraction pdf = new PdfExtraction();
 
-    public void run(ArrayList<File> pdfFiles, File outputDir) {
+    public void run(File[] pdfFiles, File outputDir) {
         for (File pdfFile : pdfFiles) {
             logger.info("=================================");
+            if (!pdfFile.isFile()) {
+                logger.error("Error | This is not file. | " + pdfFile);
+                continue;
+            }
+            if (!pdfFile.getName().substring(pdfFile.getName().lastIndexOf(".") + 1).equals("pdf")) {
+                logger.error("Error | This is not pdf file. | " + pdfFile);
+                continue;
+            }
             procPdfToExcel(pdfFile, outputDir);
         }
     }
@@ -71,18 +79,18 @@ public class WordBookMaker {
     }
 
     public static void main(String[] args) {
-        //        args = new String[1];
-        //        args[0] = WordBookMaker.class.getClassLoader().getResource("WordBookMaker_Config.xml").getPath();
+        //                args = new String[1];
+        //                args[0] = WordBookMaker.class.getClassLoader().getResource("WordBookMaker_Config.xml").getPath();
         if (args.length != 1) {
             System.out.println("args[0] = xmlFilePath");
         } else {
             ReadXml xml = new ReadXml(new File(args[0]));
 
-            ArrayList<File> inputFileList = xml.getInputFileList();
+            File[] inputFiles = xml.getInputFiles();
             File outputDir = xml.getOutputDirFile();
 
             WordBookMaker maker = new WordBookMaker();
-            maker.run(inputFileList, outputDir);
+            maker.run(inputFiles, outputDir);
             try {
                 Thread.sleep(1000);
             } catch (InterruptedException e) {
