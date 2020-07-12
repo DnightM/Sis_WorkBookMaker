@@ -71,8 +71,8 @@ public class WordBookMaker {
     }
 
     public static void main(String[] args) {
-//        args = new String[1];
-//        args[0] = WordBookMaker.class.getClassLoader().getResource("WordBookMaker_Config.xml").getPath();
+        //        args = new String[1];
+        //        args[0] = WordBookMaker.class.getClassLoader().getResource("WordBookMaker_Config.xml").getPath();
         if (args.length != 1) {
             System.out.println("args[0] = xmlFilePath");
         } else {
