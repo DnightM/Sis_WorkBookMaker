@@ -24,24 +24,22 @@ public class WriteExcel {
 
         // set data
         int r = 0;
+        XSSFRow row = null;
         for (int j = 0; j < list.size(); j++) {
-            int t = 0;
             for (int i = 0; i < 2; i++) {
-                int tj = j;
-                XSSFRow row = sheet[i].createRow(r);
+                if (j % 3 == 0) {
+                    row = sheet[i].createRow(r);
+                }
                 XSSFCell cell = null;
-                for (int k = 0; k < 5; k += 2) {
-                    cell = row.createCell(k);
-                    cell.setCellValue(list.get(tj).getWord());
-                    if (i % 2 == 1) {
-                        cell = row.createCell(k + 1);
-                        cell.setCellValue(list.get(tj).getMean());
-                    }
-                    tj++;
-                    t++;
+                int q = j % 3 * 2;
+                cell = row.createCell(q);
+                cell.setCellValue(list.get(j).getWord());
+                if (i % 2 == 1) {
+                    int a = j % 3 * 2 + 1;
+                    cell = row.createCell(a);
+                    cell.setCellValue(list.get(j).getMean());
                 }
             }
-            j += t / 2;
             r++;
         }
 

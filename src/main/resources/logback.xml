@@ -6,15 +6,7 @@
 
 <!DOCTYPE configuration [
 	<!ENTITY charset "UTF-8">
-	<!ENTITY InfoFileName "Info">
-	<!ENTITY ErrorFileName "Error">
-	<!ENTITY FileFormat "&#37;d{yyyyMM}">
-	
-	<!ENTITY Path "./Log/">
-	
 	<!ENTITY LogPattern "&#91;&#37;d{yyyyMMdd HHmmss}&#93; &#37;msg&#37;n">
-	
-	<!ENTITY AgingTerm "90">
 ]>
 <configuration scan="true" scanPeriod="30 seconds">
 
@@ -27,67 +19,8 @@
 		</encoder>
 	</appender>
 
-	<appender name="INFO" class="ch.qos.logback.core.rolling.RollingFileAppender">
-		<filter class="ch.qos.logback.classic.filter.LevelFilter">
-			<level>INFO</level>
-			<onMatch>ACCEPT</onMatch>
-			<onMismatch>DENY</onMismatch>
-		</filter>
-		<file>&Path;/&InfoFileName;.log
-		</file>
-		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-			<fileNamePattern>&Path;/&InfoFileName;_&FileFormat;.log
-			</fileNamePattern>
-			<maxHistory>&AgingTerm;
-			</maxHistory>
-		</rollingPolicy>
-		<append>true</append>
-		<immediateFlush>true</immediateFlush>
-		<encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
-			<charset>&charset;
-			</charset>
-			<Pattern>&LogPattern;
-			</Pattern>
-		</encoder>
-	</appender>
-
-	<appender name="ERROR" class="ch.qos.logback.core.rolling.RollingFileAppender">
-		<filter class="ch.qos.logback.classic.filter.LevelFilter">
-			<level>ERROR</level>
-			<onMatch>ACCEPT</onMatch>
-			<onMismatch>DENY</onMismatch>
-		</filter>
-		<file>&Path;/&ErrorFileName;.log
-		</file>
-		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-			<fileNamePattern>&Path;/&ErrorFileName;_&FileFormat;.log
-			</fileNamePattern>
-			<maxHistory>&AgingTerm;
-			</maxHistory>
-		</rollingPolicy>
-		<append>true</append>
-		<immediateFlush>true</immediateFlush>
-		<encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
-			<charset>&charset;
-			</charset>
-			<Pattern>&LogPattern;
-			</Pattern>
-		</encoder>
-	</appender>
-
-	<logger name="INFO" additivity="false">
-		<level value="INFO"/>
-		<appender-ref ref="INFO"/>
-	</logger>
-	<logger name="ERROR" additivity="false">
-		<level value="ERROR"/>
-		<appender-ref ref="ERROR"/>
-	</logger>
-
 	<root level="TRACE">
 		<appender-ref ref="CONSOLE"/> <!-- Console에 로그를 출력하고자 할 때 사용 -->
-		<appender-ref ref="INFO"/> <!-- Info File로 로그를 남기고자 할 때 사용 -->
-		<appender-ref ref="ERROR"/> <!-- Error File로 로그를 남기고자 할 때 사용 -->
 	</root>
 </configuration>
 

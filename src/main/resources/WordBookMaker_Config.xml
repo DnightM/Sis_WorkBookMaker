@@ -1,0 +1,5 @@
+<wordbook>
+	<input>./input/v101.pdf</input>
+	<input>./input/v201.pdf</input>
+	<output>./</output>
+</wordbook>

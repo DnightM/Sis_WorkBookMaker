@@ -1,14 +1,14 @@
 apply plugin: 'java'
 apply plugin:'application'
 
-mainClassName = 'wordbook.WordBookMaker'
+mainClassName = 'main.WordBookMaker'
 sourceCompatibility = 1.8
 version = '0.0.1'
 buildDir = './build'
 
 ext {
     processName= 'WordBookMaker'
-    outputDir = './output'
+    outputDir = 'C:/Users/JiHoon/Desktop/WordBookMaker'
 }
 
 jar {
@@ -21,9 +21,9 @@ jar {
         configurations.compile.collect {it.isDirectory()? it: zipTree(it)}
     }
 
-    exclude 'config/**'
+    exclude '/config/*.xml'
 }
-/*
+
 task copyJar(type: Copy) {
     from "${buildDir}/libs"
     into "${outputDir}"
@@ -31,10 +31,10 @@ task copyJar(type: Copy) {
 }
 
 task copyConfig(type: Copy) {
-    from "${buildDir}/resources/main/config"
-    into "${outputDir}/config"
+    from "${buildDir}/resources/main/WordBookMaker_Config.xml"
+    into "${outputDir}"
 }
-*/
+
 tasks.withType(JavaCompile) {
     options.encoding = 'UTF-8'
 }
@@ -70,4 +70,4 @@ dependencies {
     
 }
 
-// build.dependsOn copyJar, copyConfig
+build.dependsOn copyJar, copyConfig
