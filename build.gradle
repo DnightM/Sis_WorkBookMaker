@@ -1,0 +1,73 @@
+apply plugin: 'java'
+apply plugin:'application'
+
+mainClassName = 'wordbook.WordBookMaker'
+sourceCompatibility = 1.8
+version = '0.0.1'
+buildDir = './build'
+
+ext {
+    processName= 'WordBookMaker'
+    outputDir = './output'
+}
+
+jar {
+    manifest {
+        attributes  'Title': "${processName}", 'Version': version, 'Main-Class': mainClassName, 'Class-Path' : '.'
+    }
+    archiveName "${processName}_" + version + '.jar'
+    dependsOn configurations.runtime
+    from {
+        configurations.compile.collect {it.isDirectory()? it: zipTree(it)}
+    }
+
+    exclude 'config/**'
+}
+/*
+task copyJar(type: Copy) {
+    from "${buildDir}/libs"
+    into "${outputDir}"
+    println("${outputDir}")
+}
+
+task copyConfig(type: Copy) {
+    from "${buildDir}/resources/main/config"
+    into "${outputDir}/config"
+}
+*/
+tasks.withType(JavaCompile) {
+    options.encoding = 'UTF-8'
+}
+
+repositories {
+    // Use jcenter for resolving your dependencies.
+    // You can declare any Maven/Ivy/file repository here.
+    mavenCentral()
+    jcenter()
+}
+
+dependencies {
+    // Use JUnit test framework
+    testImplementation 'junit:junit:4.12'
+    
+    // https://mvnrepository.com/artifact/org.apache.pdfbox/pdfbox
+    compile group: 'org.apache.pdfbox', name: 'pdfbox', version: '2.0.20'
+ 
+    // https://mvnrepository.com/artifact/org.apache.pdfbox/fontbox
+    compile group: 'org.apache.pdfbox', name: 'fontbox', version: '2.0.20'
+
+
+    compile group: 'ch.qos.logback', name: 'logback-classic', version: "1.2.3"
+    // https://mvnrepository.com/artifact/ch.qos.logback/logback-core
+    compile group: 'ch.qos.logback', name: 'logback-core', version: "1.2.3"
+    
+    // https://mvnrepository.com/artifact/org.apache.poi/poi
+    compile group: 'org.apache.poi', name: 'poi', version: '4.1.2'
+    
+    // https://mvnrepository.com/artifact/org.apache.poi/poi-ooxml
+    compile group: 'org.apache.poi', name: 'poi-ooxml', version: '4.1.2'
+    
+    
+}
+
+// build.dependsOn copyJar, copyConfig
