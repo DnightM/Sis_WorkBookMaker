@@ -1,4 +1,4 @@
 echo off
 chcp 65001
-C:\Users\JiHoon\Desktop\Eclipse\JDK\jdk1.8.0_191\bin\java -jar .\WordBookMaker_0.0.1.jar .\WordBookMaker_Config.xml
+.\jre_1.8\bin\java -jar -Dfile.encoding=UTF-8 .\WordBookMaker_0.1.0.jar .\WordBookMaker_Config.xml
 pause

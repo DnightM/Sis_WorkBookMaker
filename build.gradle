@@ -3,7 +3,7 @@ apply plugin:'application'
 
 mainClassName = 'main.WordBookMaker'
 sourceCompatibility = 1.8
-version = '0.0.1'
+version = '0.1.0'
 buildDir = './build'
 
 ext {
@@ -21,17 +21,14 @@ jar {
         configurations.compile.collect {it.isDirectory()? it: zipTree(it)}
     }
 
-    exclude '/config/*.xml'
+    exclude 'start.bat'
+    exclude 'WordBookMaker_Config.xml'
 }
 
-task copyJar(type: Copy) {
+task copyFile(type: Copy) {
     from "${buildDir}/libs"
-    into "${outputDir}"
-    println("${outputDir}")
-}
-
-task copyConfig(type: Copy) {
     from "${buildDir}/resources/main/WordBookMaker_Config.xml"
+    from "${buildDir}/resources/main/start.bat"
     into "${outputDir}"
 }
 
@@ -70,4 +67,4 @@ dependencies {
     
 }
 
-build.dependsOn copyJar, copyConfig
+build.dependsOn copyFile
