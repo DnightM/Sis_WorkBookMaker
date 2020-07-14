@@ -71,7 +71,7 @@ public class WordBookMaker {
                 }
             }
             pageInfo = pages[0] == pages[1] ? String.valueOf(pages[0]) : pages[0] + "-" + pages[1];
-            logger.info("File | " + pdfFile + " | Total Word Ctn : " + count + " | Page | " + pageInfo);
+            logger.info("File | " + pdfFile + " | Total Word Ctn : " + count + " | Page : " + pageInfo);
         } catch (Exception e) {
             e.printStackTrace();
         }

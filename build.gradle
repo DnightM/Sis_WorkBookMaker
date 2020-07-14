@@ -3,7 +3,7 @@ apply plugin:'application'
 
 mainClassName = 'main.WordBookMaker'
 sourceCompatibility = 1.8
-version = '0.1.0'
+version = '1.0.0'
 buildDir = './build'
 
 ext {
