@@ -13,7 +13,9 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import vo.WordBookVo;
 
 public class WriteExcel {
-    public void excelWrite(ArrayList<WordBookVo> list, File outputQuestion, File outputAnswer) throws IOException {
+    private static final int cellWidth = 3500;
+
+    public void excelWrite(ArrayList<WordBookVo> list, File outputQuestion, File outputAnswer, int limitWordCtn) throws IOException {
         // create workbook
         XSSFWorkbook[] workbook = new XSSFWorkbook[2];
         XSSFSheet[] sheet = new XSSFSheet[2];
@@ -23,24 +25,28 @@ public class WriteExcel {
         }
 
         // set data
-        int r = 0;
-        XSSFRow row = null;
-        for (int j = 0; j < list.size(); j++) {
-            for (int i = 0; i < 2; i++) {
+        int len = Math.min(limitWordCtn, list.size());
+        for (int i = 0; i < 2; i++) {
+            int r = -1;
+            boolean isAnswer = i % 2 == 1;
+            XSSFRow row = null;
+            for (int j = 0; j < len; j++) {
                 if (j % 3 == 0) {
-                    row = sheet[i].createRow(r);
+                    row = sheet[i].createRow(++r);
                 }
                 XSSFCell cell = null;
-                int q = j % 3 * 2;
-                cell = row.createCell(q);
+                int questionIdx = j % 3 * 2;
+                sheet[i].setColumnWidth(questionIdx, cellWidth);
+                cell = row.createCell(questionIdx);
                 cell.setCellValue(list.get(j).getWord());
-                if (i % 2 == 1) {
-                    int a = j % 3 * 2 + 1;
-                    cell = row.createCell(a);
+                if (isAnswer) {
+                    int answerIdx = j % 3 * 2 + 1;
+                    sheet[i].setColumnWidth(answerIdx, cellWidth);
+                    cell = row.createCell(answerIdx);
                     cell.setCellValue(list.get(j).getMean());
                 }
             }
-            r++;
+            // 한줄에 3개씩 write 함
         }
 
         // write
@@ -52,22 +58,5 @@ public class WriteExcel {
             workbook[i].close();
             fos[i].close();
         }
-    }
-
-    public void excelWrite(ArrayList<WordBookVo> list, File outputQuestion) throws IOException {
-        XSSFWorkbook workbook = new XSSFWorkbook();
-        XSSFSheet sheet = workbook.createSheet();
-        int r = 0;
-        for (int i = 0; i < list.size(); i++) {
-            XSSFRow row = sheet.createRow(r++);
-            for (int j = 0; j < 5; j += 2) {
-                XSSFCell cell1 = row.createCell(j);
-                cell1.setCellValue(list.get(i++).getWord());
-            }
-        }
-        FileOutputStream fos = new FileOutputStream(outputQuestion);
-        workbook.write(fos);
-        fos.close();
-        workbook.close();
     }
 }
