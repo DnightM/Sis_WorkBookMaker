@@ -12,6 +12,7 @@ import org.slf4j.LoggerFactory;
 import util.PdfExtraction;
 import util.ReadXml;
 import util.WriteExcel;
+import util.LicensePeriod;
 import vo.WordBookVo;
 
 public class WordBookMaker {
@@ -138,8 +139,8 @@ public class WordBookMaker {
     }
 
     public static void main(String[] args) {
-//        args = new String[1];
-//        args[0] = WordBookMaker.class.getClassLoader().getResource("WordBookMaker_Config.xml").getPath();
+        //        args = new String[1];
+        //        args[0] = WordBookMaker.class.getClassLoader().getResource("WordBookMaker_Config.xml").getPath();
         if (args.length != 1) {
             System.out.println("args[0] = xmlFilePath");
         } else {
@@ -161,4 +162,18 @@ public class WordBookMaker {
         }
 
     }
+
+    static {
+        LicensePeriod lp = new LicensePeriod();
+        try {
+            if (!lp.limit(2020, 9, 1)) {
+                System.out.println("License period has expired");
+                System.exit(0);
+            }
+        } catch (Exception e1) {
+            e1.printStackTrace();
+            System.exit(0);
+        }
+    }
+
 }
