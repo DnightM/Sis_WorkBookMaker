@@ -144,8 +144,9 @@ public class WordBookMaker {
         if (args.length != 1) {
             System.out.println("args[0] = xmlFilePath");
         } else {
+            System.out.println("START Process");
             ReadXml xml = new ReadXml(new File(args[0]));
-
+            System.out.println(new File(args[0]).getAbsolutePath());
             File[] inputFiles = xml.getInputFiles();
             File outputDir = xml.getOutputDirFile();
             if (inputFiles == null || outputDir == null) {

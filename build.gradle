@@ -1,14 +1,21 @@
-apply plugin: 'java'
-apply plugin:'application'
+plugins {
+	id 'java'
+	id 'application'
+}
 
 mainClassName = 'main.WordBookMaker'
-sourceCompatibility = 1.8
 version = '1.0.0'
 buildDir = './build'
 
+java {
+    sourceCompatibility = JavaVersion.VERSION_1_8
+    targetCompatibility = JavaVersion.VERSION_1_8
+}
+
 ext {
     processName= 'WordBookMaker'
-    outputDir = 'C:/Users/JiHoon/Desktop/WordBookMaker'
+    outputDir = "C:/Users/JiHoon/Desktop/${processName}"
+    xmlConfig = 'WordBookMaker_Config.xml'
 }
 
 jar {
@@ -22,14 +29,32 @@ jar {
     }
 
     exclude 'start.bat'
-    exclude 'WordBookMaker_Config.xml'
+    exclude "${xmlConfig}"
 }
 
+task makeDirs{
+	new File("${outputDir}/input").mkdirs()
+	new File("${outputDir}/output").mkdirs()
+}
 task copyFile(type: Copy) {
     from "${buildDir}/libs"
     from "${buildDir}/resources/main/WordBookMaker_Config.xml"
-    from "${buildDir}/resources/main/start.bat"
     into "${outputDir}"
+}
+
+task copyJre(type: Copy) {
+	from System.getProperty('java.home')
+	into "${outputDir}/jre"
+}
+
+task makeBatch()  {
+    doLast {
+        new File("${outputDir}", "start.bat").text =
+    	"echo off"+ "\n" +
+		"chcp 65001"+ "\n" +
+		"./jre/bin/java -jar -Dfile.encoding=UTF-8 ./${processName}_" + version + ".jar ./${xmlConfig}"+ "\n" +
+		"pause"+ "\n"
+    }
 }
 
 tasks.withType(JavaCompile) {
@@ -37,8 +62,6 @@ tasks.withType(JavaCompile) {
 }
 
 repositories {
-    // Use jcenter for resolving your dependencies.
-    // You can declare any Maven/Ivy/file repository here.
     mavenCentral()
     jcenter()
 }
@@ -64,7 +87,6 @@ dependencies {
     // https://mvnrepository.com/artifact/org.apache.poi/poi-ooxml
     compile group: 'org.apache.poi', name: 'poi-ooxml', version: '4.1.2'
     
-    
 }
 
-build.dependsOn copyFile
+build.dependsOn copyFile, makeBatch, makeDirs, copyJre
