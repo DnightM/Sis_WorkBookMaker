@@ -13,9 +13,9 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import vo.WordBookVo;
 
 public class WriteExcel {
-    private static final int cellWidth = 3500;
+    private static final int cellSize = 3500;
 
-    public void excelWrite(ArrayList<WordBookVo> list, File outputQuestion, File outputAnswer, int limitWordCtn) throws IOException {
+    public int excelWrite(ArrayList<WordBookVo> list, File outputQuestion, File outputAnswer, int limitWordCtn, int cellWidth) throws IOException {
         // create workbook
         XSSFWorkbook[] workbook = new XSSFWorkbook[2];
         XSSFSheet[] sheet = new XSSFSheet[2];
@@ -31,22 +31,22 @@ public class WriteExcel {
             boolean isAnswer = i % 2 == 1;
             XSSFRow row = null;
             for (int j = 0; j < len; j++) {
-                if (j % 3 == 0) {
+                if (j % cellWidth == 0) {
                     row = sheet[i].createRow(++r);
                 }
                 XSSFCell cell = null;
-                int questionIdx = j % 3 * 2;
-                sheet[i].setColumnWidth(questionIdx, cellWidth);
+                int questionIdx = j % cellWidth * 2;
+                sheet[i].setColumnWidth(cellSize, cellWidth);
                 cell = row.createCell(questionIdx);
                 cell.setCellValue(list.get(j).getWord());
                 if (isAnswer) {
-                    int answerIdx = j % 3 * 2 + 1;
-                    sheet[i].setColumnWidth(answerIdx, cellWidth);
+                    int answerIdx = j % cellWidth * 2 + 1;
+                    sheet[i].setColumnWidth(cellSize, cellWidth);
                     cell = row.createCell(answerIdx);
                     cell.setCellValue(list.get(j).getMean());
                 }
             }
-            // 한줄에 3개씩 write 함
+            // 한줄에 width개씩 write 함
         }
 
         // write
@@ -58,5 +58,6 @@ public class WriteExcel {
             workbook[i].close();
             fos[i].close();
         }
+        return len;
     }
 }

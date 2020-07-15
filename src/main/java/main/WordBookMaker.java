@@ -21,7 +21,17 @@ public class WordBookMaker {
     private WriteExcel excel = new WriteExcel();
     private PdfExtraction pdf = new PdfExtraction();
 
+    int[] pages;
+    private int limitWordCtn;
+    private int cellWidth;
+    boolean isShuffle;
+
     public void run(File[] pdfFiles, File outputDir) {
+        pages = getPages();
+        limitWordCtn = getNumber("\tInput number of words to extract : ");
+        cellWidth = getNumber("\tInput the horizontal number of cells in an Excel cell : ");
+        isShuffle = getBoolean("\tDo you want shuffle[y/n]?");
+
         for (File pdfFile : pdfFiles) {
             logger.info("=================================");
             if (!pdfFile.isFile()) {
@@ -42,19 +52,14 @@ public class WordBookMaker {
 
         // pdf 추출
         String pageInfo = null;
-        int limitWordCtn = -1;
+        int count = 0;
         try {
-            logger.info("[" + pdfFile.getName() + "]");
-
-            int[] pages = getPages();
-            limitWordCtn = getWordCtn();
             String pdfTxt = pdf.extractingText(pdfFile, pages);
             if (pdfTxt == null) {
                 logger.info("File | " + pdfFile + " | Can't work. Skip this file");
                 return;
             }
             String[] pdfTxtLines = pdfTxt.split("\n");
-            int count = 0;
             for (String line : pdfTxtLines) {
                 if (line.contains(":")) {
                     line = line.trim();
@@ -71,7 +76,6 @@ public class WordBookMaker {
                 }
             }
             pageInfo = pages[0] == pages[1] ? String.valueOf(pages[0]) : pages[0] + "-" + pages[1];
-            logger.info("File | " + pdfFile + " | Total Word Ctn : " + count + " | Page : " + pageInfo);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -81,11 +85,11 @@ public class WordBookMaker {
 
         // excel로 write
         String filename = pdfFile.getName().substring(0, pdfFile.getName().lastIndexOf("."));
-        File outputQuestion = new File(outputDir, filename + "_문제_Page_" + pageInfo + "_" + limitWordCtn + "개.xlsx");
-        File outputAnswer = new File(outputDir, filename + "_정답_Page_" + pageInfo + "_" + limitWordCtn + "개.xlsx");
+        File outputQuestion = new File(outputDir, filename + "_문제_Page" + pageInfo + "_" + limitWordCtn + "개" + (isShuffle ? "_shuffle_" : "") + ".xlsx");
+        File outputAnswer = new File(outputDir, filename + "_정답_Page" + pageInfo + "_" + limitWordCtn + "개" + (isShuffle ? "_shuffle_" : "") + ".xlsx");
         try {
-            excel.excelWrite(list, outputQuestion, outputAnswer, limitWordCtn);
-            logger.info(pdfFile.getAbsolutePath());
+            int extractionCtn = excel.excelWrite(list, outputQuestion, outputAnswer, limitWordCtn, cellWidth);
+            logger.info("[" + pdfFile.getName() + "] | Total Word Ctn : " + count + " | Select Word Ctn : " + extractionCtn + " | Page : " + pageInfo + " | Shuffle : " + (isShuffle ? "Yes" : "No"));
             logger.info("\t-> " + outputQuestion.getAbsolutePath());
             logger.info("\t-> " + outputAnswer.getAbsolutePath());
         } catch (IOException e) {
@@ -94,14 +98,31 @@ public class WordBookMaker {
 
     }
 
-    private int getWordCtn() {
-        System.out.print("\tInput number of words to extract : ");
-        String msg = sc.nextLine();
+    private boolean getBoolean(String msg) {
+        System.out.print(msg);
+        String input = sc.nextLine().trim().toLowerCase();
         try {
-            return Integer.parseInt(msg.trim());
+            if (input.equals("y")) {
+                return true;
+            } else if (input.equals("n")) {
+                return false;
+            }
+            logger.info("Invalid answer[y/n]. Try again.");
+            return getBoolean(msg);
+        } catch (Exception e) {
+            logger.info("Invalid answer[y/n]. Try again.");
+            return getBoolean(msg);
+        }
+    }
+
+    private int getNumber(String msg) {
+        System.out.print(msg);
+        String input = sc.nextLine();
+        try {
+            return Integer.parseInt(input.trim());
         } catch (Exception e) {
             logger.info("Invalid number. Try again.");
-            return getWordCtn();
+            return getNumber(msg);
         }
     }
 
@@ -139,8 +160,8 @@ public class WordBookMaker {
     }
 
     public static void main(String[] args) {
-        //        args = new String[1];
-        //        args[0] = WordBookMaker.class.getClassLoader().getResource("WordBookMaker_Config.xml").getPath();
+        //                args = new String[1];
+        //                args[0] = WordBookMaker.class.getClassLoader().getResource("WordBookMaker_Config.xml").getPath();
         if (args.length != 1) {
             System.out.println("args[0] = xmlFilePath");
         } else {
