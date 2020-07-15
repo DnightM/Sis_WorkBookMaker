@@ -47,14 +47,25 @@ task copyJre(type: Copy) {
 	into "${outputDir}/jre"
 }
 
+task copySampleData(type: Copy) {
+	from "${buildDir}/resources/main/input"
+	into "${outputDir}/input"
+}
+
 task makeBatch()  {
-    doLast {
-        new File("${outputDir}", "start.bat").text =
-    	"echo off"+ "\n" +
-		"chcp 65001"+ "\n" +
-		"./jre/bin/java -jar -Dfile.encoding=UTF-8 ./${processName}_" + version + ".jar ./${xmlConfig}"+ "\n" +
-		"pause"+ "\n"
-    }
+    new File("${outputDir}", "start.bat").text =
+	"echo off"+ "\n" +
+	"chcp 65001"+ "\n" +
+	".\\jre\\bin\\java -jar -Dfile.encoding=UTF-8 .\\${processName}_" + version + ".jar .\\${xmlConfig}"+ "\n" +
+	"pause"+ "\n"
+}
+
+task makeZip(type: Zip) {
+	from "${outputDir}"
+    archiveName "${processName}_" + version + ".zip"
+    exclude "${archiveName}"
+    include '**'
+    destinationDir(file("${outputDir}"))
 }
 
 tasks.withType(JavaCompile) {
@@ -89,4 +100,4 @@ dependencies {
     
 }
 
-build.dependsOn copyFile, makeBatch, makeDirs, copyJre
+build.dependsOn copyFile, makeBatch, makeDirs, copyJre, copySampleData, makeZip
