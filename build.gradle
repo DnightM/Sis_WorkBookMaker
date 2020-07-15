@@ -32,27 +32,33 @@ jar {
     exclude "${xmlConfig}"
 }
 
-task makeDirs{
+task copyTask {
+	// 폴더 생성
 	new File("${outputDir}/input").mkdirs()
 	new File("${outputDir}/output").mkdirs()
-}
-task copyFile(type: Copy) {
-    from "${buildDir}/libs"
-    from "${buildDir}/resources/main/WordBookMaker_Config.xml"
-    into "${outputDir}"
-}
-
-task copyJre(type: Copy) {
-	from System.getProperty('java.home')
-	into "${outputDir}/jre"
-}
-
-task copySampleData(type: Copy) {
-	from "${buildDir}/resources/main/input"
-	into "${outputDir}/input"
+	
+	// jar 파일 및 config 파일 복사
+	copy {
+	    from "${buildDir}/libs"
+	    from "${buildDir}/resources/main/WordBookMaker_Config.xml"
+	    into "${outputDir}"
+	}
+	
+	// jre 복사
+	copy {
+		from System.getProperty('java.home')
+		into "${outputDir}/jre"
+	}
+	
+	// resource input 폴더 복사
+	copy {
+		from "${buildDir}/resources/main/input"
+		into "${outputDir}/input"
+	}
 }
 
 task makeBatch()  {
+	// batch 파일 작성
     new File("${outputDir}", "start.bat").text =
 	"echo off"+ "\n" +
 	"chcp 65001"+ "\n" +
@@ -60,7 +66,7 @@ task makeBatch()  {
 	"pause"+ "\n"
 }
 
-task makeZip(type: Zip) {
+task compressZip(type: Zip) {
 	from "${outputDir}"
     archiveName "${processName}_" + version + ".zip"
     exclude "${archiveName}"
@@ -100,4 +106,4 @@ dependencies {
     
 }
 
-build.dependsOn copyFile, makeBatch, makeDirs, copyJre, copySampleData, makeZip
+build.dependsOn copyTask, makeBatch, compressZip
