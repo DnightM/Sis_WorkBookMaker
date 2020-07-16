@@ -9,3 +9,4 @@ build
 /bin/
 /input/
 /output/
+/settings.gradle
