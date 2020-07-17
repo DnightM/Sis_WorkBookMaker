@@ -34,9 +34,10 @@ jar {
 
 task copyTask {
 	// 폴더 생성
-	new File("${outputDir}/input").mkdirs()
-	new File("${outputDir}/output").mkdirs()
-	
+	doFirst{
+		new File("${outputDir}/input").mkdirs()
+		new File("${outputDir}/output").mkdirs()
+	}
 	// jar 파일 및 config 파일 복사
 	copy {
 	    from "${buildDir}/libs"
@@ -58,20 +59,24 @@ task copyTask {
 }
 
 task makeBatch()  {
-	// batch 파일 작성
-    new File("${outputDir}", "start.bat").text =
-	"echo off"+ "\n" +
-	"chcp 65001"+ "\n" +
-	".\\jre\\bin\\java -jar -Dfile.encoding=UTF-8 .\\${processName}_" + version + ".jar .\\${xmlConfig}"+ "\n" +
-	"pause"+ "\n"
+	doLast{
+		// batch 파일 작성
+	    new File("${outputDir}", "start.bat").text =
+		"echo off"+ "\n" +
+		"chcp 65001"+ "\n" +
+		".\\jre\\bin\\java -jar -Dfile.encoding=UTF-8 .\\${processName}_" + version + ".jar .\\${xmlConfig}"+ "\n" +
+		"pause"+ "\n"
+	}
 }
 
 task compressZip(type: Zip) {
-	from "${outputDir}"
-    archiveName "${processName}_" + version + ".zip"
-    exclude "${archiveName}"
-    include '**'
-    destinationDir(file("${outputDir}"))
+	doLast{
+		from "${outputDir}"
+	    archiveName "${processName}_" + version + ".zip"
+	    exclude "${archiveName}"
+	    include '**'
+	    destinationDir(file("${outputDir}"))
+    }
 }
 
 tasks.withType(JavaCompile) {
