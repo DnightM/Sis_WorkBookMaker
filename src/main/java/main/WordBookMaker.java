@@ -17,20 +17,20 @@ import vo.WordBookVo;
 
 public class WordBookMaker {
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
-    private static Scanner sc = new Scanner(System.in);
-    private WriteExcel excel = new WriteExcel();
-    private PdfExtraction pdf = new PdfExtraction();
+    private final Scanner sc = new Scanner(System.in);
+    private final WriteExcel excel = new WriteExcel();
+    private final PdfExtraction pdf = new PdfExtraction();
 
-    int[] pages;
+    private int[] pages;
     private int limitWordCtn;
     private int cellWidth;
-    boolean isShuffle;
+    private boolean isShuffle;
 
     public void run(File[] pdfFiles, File outputDir) {
-        pages = getPages();
-        limitWordCtn = getNumber("\tInput number of words to extract : ");
-        cellWidth = getNumber("\tInput the horizontal number of cells in an Excel cell : ");
-        isShuffle = getBoolean("\tDo you want shuffle[y/n]?");
+        this.pages = getPages("\tInput number of pages to extract : ");
+        this.limitWordCtn = getInteger("\tInput number of words to extract : ");
+        this.cellWidth = getInteger("\tInput the horizontal number of cells in an Excel cell : ");
+        this.isShuffle = getBoolean("\tDo you want shuffle[y/n]?");
 
         for (File pdfFile : pdfFiles) {
             logger.info("=================================");
@@ -95,7 +95,6 @@ public class WordBookMaker {
         } catch (IOException e) {
             e.printStackTrace();
         }
-
     }
 
     private boolean getBoolean(String msg) {
@@ -115,29 +114,29 @@ public class WordBookMaker {
         }
     }
 
-    private int getNumber(String msg) {
+    private int getInteger(String msg) {
         System.out.print(msg);
         String input = sc.nextLine();
         try {
             return Integer.parseInt(input.trim());
         } catch (Exception e) {
             logger.info("Invalid number. Try again.");
-            return getNumber(msg);
+            return getInteger(msg);
         }
     }
 
-    private int[] getPages() {
-        System.out.print("\tInput number of pages to extract : ");
-        String msg = sc.nextLine();
-        int[] pages = pashing(msg);
+    private int[] getPages(String msg) {
+        System.out.print(msg);
+        String pageString = sc.nextLine();
+        int[] pages = pashingPages(pageString);
         if (pages[0] < 0) {
             logger.info("Invalid number. Try again.");
-            return getPages();
+            return getPages(msg);
         }
         return pages;
     }
 
-    private int[] pashing(String msg) {
+    private int[] pashingPages(String msg) {
         String[] temp = msg.split("-");
         if (temp.length != 2) {
             try {
@@ -160,29 +159,24 @@ public class WordBookMaker {
     }
 
     public static void main(String[] args) {
-        //                args = new String[1];
-        //                args[0] = WordBookMaker.class.getClassLoader().getResource("WordBookMaker_Config.xml").getPath();
-        if (args.length != 1) {
-            System.out.println("args[0] = xmlFilePath");
-        } else {
-            System.out.println("START Process");
-            ReadXml xml = new ReadXml(new File(args[0]));
-            System.out.println(new File(args[0]).getAbsolutePath());
-            File[] inputFiles = xml.getInputFiles();
-            File outputDir = xml.getOutputDirFile();
-            if (inputFiles == null || outputDir == null) {
-                System.out.println("Check input files and output directory");
-                return;
-            }
-            WordBookMaker maker = new WordBookMaker();
-            maker.run(inputFiles, outputDir);
-            try {
-                Thread.sleep(1000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+        System.out.println("START Process");
+        
+        ReadXml xml = new ReadXml(new File(WordBookMaker.class.getClassLoader().getResource("WordBookMaker_Config.xml").getPath()));
+        File[] inputFiles = xml.getInputFiles();
+        File outputDir = xml.getOutputDirFile();
+        if (inputFiles == null || outputDir == null) {
+            System.out.println("Check input files and output directory");
+            return;
         }
-
+        
+        WordBookMaker maker = new WordBookMaker();
+        maker.run(inputFiles, outputDir);
+        
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 
     static {
