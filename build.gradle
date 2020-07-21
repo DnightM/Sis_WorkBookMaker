@@ -12,9 +12,13 @@ java {
     targetCompatibility = JavaVersion.VERSION_1_8
 }
 
+tasks.withType(JavaCompile) {
+    options.encoding = 'UTF-8'
+}
+
 ext {
-    processName= 'WordBookMaker'
-    outputDir = "C:/Users/JiHoon/Desktop/${processName}"
+    processName = 'WordBookMaker'
+    outputDir = System.getProperty("user.home") + "/Desktop/${processName}"
     xmlConfig = 'WordBookMaker_Config.xml'
 }
 
@@ -28,37 +32,48 @@ jar {
         configurations.compile.collect {it.isDirectory()? it: zipTree(it)}
     }
 
-    exclude 'start.bat'
+    // exclude 'start.bat'
     exclude "${xmlConfig}"
 }
 
 task copyTask {
-	// 폴더 생성
 	doFirst{
-		new File("${outputDir}/input").mkdirs()
+		// 폴더 생성
+		File inputFile = new File("${outputDir}/input")
+		inputFile.mkdirs()
 		new File("${outputDir}/output").mkdirs()
-	}
-	// jar 파일 및 config 파일 복사
-	copy {
-	    from "${buildDir}/libs"
-	    from "${buildDir}/resources/main/WordBookMaker_Config.xml"
-	    into "${outputDir}"
-	}
-	
-	// jre 복사
-	copy {
-		from System.getProperty('java.home')
-		into "${outputDir}/jre"
-	}
-	
-	// resource input 폴더 복사
-	copy {
-		from "${buildDir}/resources/main/input"
-		into "${outputDir}/input"
+		println("mkdirs : input, output")
+		
+		// jre 복사
+		File jre = new File("${outputDir}/jre");
+		if (!jre.exists()){
+			copy {
+				from System.getProperty('java.home')
+				into jre
+				println("Copy JRE")
+			}
+		} else {
+			println("Skip Copy JRE")
+		}
+
+		// jar 파일 및 config 파일 복사
+		copy {
+		    from jar, "${buildDir}/resources/main/${xmlConfig}" 
+		    into "${outputDir}"
+		    println("Copy jar")
+		}
+		
+		// resource input 파일 복사
+		copy {
+			from "${buildDir}/resources/main/input"
+			into inputFile
+			println("Copy input resource files")
+		}
 	}
 }
 
-task makeBatch()  {
+task makeBatch {
+	dependsOn 'copyTask'
 	doLast{
 		// batch 파일 작성
 	    new File("${outputDir}", "start.bat").text =
@@ -66,27 +81,36 @@ task makeBatch()  {
 		"chcp 65001"+ "\n" +
 		".\\jre\\bin\\java -jar -Dfile.encoding=UTF-8 .\\${processName}_" + version + ".jar .\\${xmlConfig}"+ "\n" +
 		"pause"+ "\n"
+		println("Make Batch File")
 	}
 }
 
 task compressZip(type: Zip) {
-	doLast{
-		from "${outputDir}"
-	    archiveName "${processName}_" + version + ".zip"
-	    exclude "${archiveName}"
-	    include '**'
-	    destinationDir(file("${outputDir}"))
-    }
+	dependsOn 'makeBatch'
+    archiveName = "${processName}_" + version + ".zip"
+    exclude "${archiveName}"
+    include '**'
+    destinationDir = file("${outputDir}")
+    
+	from "${outputDir}"
+
+    println("Compress ${processName} Zip")
 }
 
-tasks.withType(JavaCompile) {
-    options.encoding = 'UTF-8'
+clean {
+	delete "${outputDir}"
+	println("Delete ${outputDir}")
+}
+
+build {
+	dependsOn compressZip
 }
 
 repositories {
     mavenCentral()
     jcenter()
 }
+
 
 dependencies {
     // Use JUnit test framework
@@ -108,7 +132,4 @@ dependencies {
     
     // https://mvnrepository.com/artifact/org.apache.poi/poi-ooxml
     compile group: 'org.apache.poi', name: 'poi-ooxml', version: '4.1.2'
-    
 }
-
-build.dependsOn copyTask, makeBatch, compressZip

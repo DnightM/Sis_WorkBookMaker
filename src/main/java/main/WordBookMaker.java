@@ -159,19 +159,21 @@ public class WordBookMaker {
     }
 
     public static void main(String[] args) {
+        if (args == null || args.length < 1) {
+            System.out.println("args[0]=config.xml file path");
+        }
         System.out.println("START Process");
-        
-        ReadXml xml = new ReadXml(new File(WordBookMaker.class.getClassLoader().getResource("WordBookMaker_Config.xml").getPath()));
+        ReadXml xml = new ReadXml(new File(args[0]));
         File[] inputFiles = xml.getInputFiles();
         File outputDir = xml.getOutputDirFile();
         if (inputFiles == null || outputDir == null) {
             System.out.println("Check input files and output directory");
             return;
         }
-        
+
         WordBookMaker maker = new WordBookMaker();
         maker.run(inputFiles, outputDir);
-        
+
         try {
             Thread.sleep(1000);
         } catch (InterruptedException e) {
