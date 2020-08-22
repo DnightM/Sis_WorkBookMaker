@@ -2,6 +2,7 @@ package main;
 
 import java.io.File;
 import java.io.IOException;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Scanner;
@@ -141,9 +142,9 @@ public class WordBookMaker {
         if (temp.length != 2) {
             try {
                 int p = Integer.parseInt(msg.trim());
-                return new int[] { p, p };
+                return new int[]{p, p};
             } catch (Exception e) {
-                return new int[] { -1 };
+                return new int[]{-1};
             }
         }
 
@@ -152,7 +153,7 @@ public class WordBookMaker {
             try {
                 result[i] = Integer.parseInt(temp[i].trim());
             } catch (Exception e) {
-                return new int[] { -1 };
+                return new int[]{-1};
             }
         }
         return result;
@@ -182,9 +183,11 @@ public class WordBookMaker {
     }
 
     static {
+        // 빌드 날짜 기준 다음달 말일까지
+        LocalDate ld = LocalDate.now();
         LicensePeriod lp = new LicensePeriod();
         try {
-            if (!lp.limit(2020, 9, 1)) {
+            if (!lp.limit(ld.getYear(), ld.getMonthValue() + 2, 1)) {
                 System.out.println("License period has expired");
                 System.exit(0);
             }
