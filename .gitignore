@@ -1,6 +1,8 @@
 # Ignore Gradle project-specific cache directory
 .gradle
 gradlew.bat
+gradlew
+/settings.gradle
 
 # Ignore Gradle build output directory
 build
@@ -10,4 +12,4 @@ build
 /bin/
 /input/
 /output/
-/settings.gradle
+
