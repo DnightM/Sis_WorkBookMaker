@@ -45,7 +45,7 @@ task copyTask {
 		println("mkdirs : input, output")
 		
 		// jre 복사
-		File jre = new File("${outputDir}/jre");
+		File jre = new File("${outputDir}/jre")
 		if (!jre.exists()){
 			copy {
 				from System.getProperty('java.home')
